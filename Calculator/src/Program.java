@@ -1,4 +1,4 @@
-import org.jetbrains.annotations.NotNull;
+
 
 import java.util.Scanner;
 
@@ -17,34 +17,58 @@ import java.util.Scanner;
 
 public class Program {
 
-
-    public static @NotNull String simplifySingle(String equation, char sign) {
+    /**
+     *
+     * @param equation równanie ktorego częśc trzeba uprościć
+     * @param sign znak działania które nalezy wykonywać
+     * @return uproszczone równanie z wykonanymi działaniami podanego znaku
+     */
+    public static String simplifySingle(String equation, char sign) {
         // 2+2+2
         String before, after;
+        String componentX, componentY;
         int start = 0, end = 0, j;
+        /*petla szukajaca indexu danego znaku i indeksu poczatku liczby po jego lewej i indexu konca liczby po jego prawej
+          następnie wycinany są dwie liczby z prawej i lewej strony znaku
+          wykoynwane jest działanie
+          i wynik działania umieszczamy w miejsce tego znaku i liczb
+        * */
+
         for (int i = 1; i < equation.length(); i++) {
             if (equation.charAt(i) == sign) {
-                j = i - 1;
-                while (Character.isDigit(equation.charAt(j)) || equation.charAt(j) == '.') {
-                    if (j > 0) {
+                j = i - 1; // i jest indexem znaku
+                while ( j > 0) {
+                    if (Character.isDigit(equation.charAt(j)) || equation.charAt(j) == '.' ) {
                         j--;
-                    }else {break;}
+                    }else{break;}
                 }
                 start = j;
-                j = i + 1;
-                while (Character.isDigit(equation.charAt(j)) || equation.charAt(j) == '.') {
-                    if (j < equation.length() - 1) {
+                j = i+1;
+                while ( j < equation.length()-1) {
+                    if( Character.isDigit(equation.charAt(j)) || equation.charAt(j) == '.') {
                         j++;
-                    }else {break;}
+                    }
+                    else {break;}
                 }
-
                 end = j;
-                //tutaj jest problem :/
-                String a = equation.substring(i + 1, end+1);
-                String b = equation.substring(start, i);
-                Calculator calculator = new Calculator(Double.parseDouble(equation.substring(start, i)), Double.parseDouble(equation.substring(i + 1, end+1)), sign);
+
+                /*omijamy problem z substringiem jak trafiamy na koniec stringa
+                        1+1 jest czytane jako a=1 b=1
+                        a 1+1+1 jako a=1 b=1+
+                 */
+                if(end+1 == equation.length()){
+                    componentX = equation.substring(i + 1, end+1);
+                    before = equation.substring(end+1);
+                }
+                else
+                {
+                    componentX = equation.substring(i + 1, end);
+                    before = equation.substring(end);
+
+                }
                 after = equation.substring(0, start);
-                before = equation.substring(end);
+                componentY = equation.substring(start, i);
+                Calculator calculator = new Calculator(Double.parseDouble(componentX), Double.parseDouble(componentY), sign);
                 equation = after + calculator.result + before;
 
             }
@@ -52,7 +76,7 @@ public class Program {
         return equation;
     }
 
-    public static String simplify(@NotNull String equation){
+    public static String simplify(String equation){
 
         String before, after;
         int counter=0;
@@ -60,7 +84,7 @@ public class Program {
             if(equation.charAt(i)=='-'){
                 counter++;
             }
-            else{                   // 012345678
+            else{              // 012345678
                 if(counter>1){ // 555---423
                     before=equation.substring(0,i-counter);
                     after=equation.substring(i);
@@ -113,7 +137,7 @@ public class Program {
     }
 
 
-    public static char extractSign(@NotNull String string){
+    public static char extractSign( String string){
 
         if (string.indexOf('+')>0) {
             return string.toCharArray()[string.indexOf('+')];
